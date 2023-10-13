@@ -100,3 +100,38 @@
     (is (= (linear-search foo 69421) false))
     (is (= (linear-search foo 1) true))
     (is (= (linear-search foo 0) false))))
+
+;; binary search algorithm
+
+;; doozy, he said, off-by-one? he said
+
+;; question to ask: is it ordered?
+;; if yes => guess where to start searching!
+;; 
+;; halve, halve, halve! until it's 1
+;; how many halving? N/2^k = 1 ==> k = log n
+;; O(logN)
+
+;; BigO trick => halving? might be O(logN) or O(NlogN)
+
+(defn binary-search [haystack needle]
+  (-> (loop [lo 0 hi (count haystack)]
+        (when (< lo hi)
+          (let [mid (Math/floor (+ lo (/ (- hi lo) 2)))
+                v   (get haystack mid)]
+            (if (= needle v)
+              true
+              (if (> needle v)
+                (recur (inc mid) hi)
+                (recur lo mid))))))
+      (boolean)))
+
+
+(let [foo [1, 3, 4, 69, 71, 81, 90, 99, 420, 1337, 69420]]
+  (testing "binary-search array"
+    (is (= (binary-search foo 69) true))
+    (is (= (binary-search foo 1336) false))
+    (is (= (binary-search foo 69420) true))
+    (is (= (binary-search foo 69421) false))
+    (is (= (binary-search foo 1) true))
+    (is (= (binary-search foo 0) false))))
