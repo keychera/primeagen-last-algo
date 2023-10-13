@@ -1,5 +1,5 @@
 (ns user
-  (:require [clojure.test :refer [is]]))
+  (:require [clojure.test :refer [is testing]]))
 ;; for learning https://frontendmasters.com/courses/algorithms/
 ;; clojure might be not the best suited for this
 ;; this is just notes and for fun
@@ -75,3 +75,28 @@
 
 ;; array = getting, insertion, deletion at specific idx
 ;;         fixed size, contiguous
+
+;; SEARCH
+;; c03 linear search
+
+;; now using https://github.com/ThePrimeagen/kata-machine
+;; but we copy the test here
+
+;; clojure note: no early return on clojure
+
+(defn linear-search [haystack needle]
+  (loop [i 0]
+    (if (< i (count haystack))
+      (if (= (get haystack i) needle)
+        true
+        (recur (inc i)))
+      false)))
+
+(let [foo [1, 3, 4, 69, 71, 81, 90, 99, 420, 1337, 69420]]
+  (testing "linear search array"
+    (is (= (linear-search foo 69) true))
+    (is (= (linear-search foo 1336) false))
+    (is (= (linear-search foo 69420) true))
+    (is (= (linear-search foo 69421) false))
+    (is (= (linear-search foo 1) true))
+    (is (= (linear-search foo 0) false))))
