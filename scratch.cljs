@@ -135,3 +135,39 @@
     (is (= (binary-search foo 69421) false))
     (is (= (binary-search foo 1) true))
     (is (= (binary-search foo 0) false))))
+
+;; 2 Crystal Ball
+
+(defn two-crystal-balls [data]
+  (let [size    (count data)
+        jmp-amt (Math/floor (Math/sqrt size))
+        first-break
+        ,, (loop [i 0]
+             (if (< i size)
+               (if (true? (get data i))
+                 i
+                 (recur (+ i jmp-amt)))
+               -1))]
+    (if (= first-break -1)
+      -1
+      (loop [i (inc (- first-break jmp-amt))]
+        (if (<= i first-break)
+          (if (true? (get data i))
+            i
+            (recur (inc i)))
+          -1)))))
+;; first try baby!
+
+;; note on why sqrt of N => improving O(N) to O(√N)
+
+(let [size 10000
+      idx  (Math/floor (* (Math/random) size))
+      data (.. (js/Array. size) (fill false))]
+  (loop [i idx]
+    (when (< i size)
+      (aset data i true)
+      (recur (inc i))))
+
+  (testing "two crystal balls"
+    (is (= (two-crystal-balls data) idx))
+    (is (= (two-crystal-balls (.. (js/Array. 821) (fill false))) -1))))
