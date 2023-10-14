@@ -160,6 +160,23 @@
 
 ;; note on why sqrt of N => improving O(N) to O(√N)
 
+(defn two-crystal-balls-clj [data]
+  (let [jmp-amt (Math/floor (Math/sqrt (count data)))
+        [[first-break-idx remaining-search]]
+        ,, (into []
+                 (comp (map-indexed (fn [idx el] [idx el]))
+                       (filter (fn [[_ el]] (some true? el)))
+                       (take 1))
+                 (partition jmp-amt data))
+        [[remaining-idx _] :as linear-search-res]
+        ,, (into []
+                 (comp (map-indexed (fn [idx el] [idx el]))
+                       (filter (fn [[_ el]] (true? el)))
+                       (take 1))
+                 remaining-search)]
+    (if (empty? linear-search-res) -1
+        (+ (* first-break-idx jmp-amt) remaining-idx))))
+
 (let [size 10000
       idx  (Math/floor (* (Math/random) size))
       data (.. (js/Array. size) (fill false))]
@@ -170,4 +187,17 @@
 
   (testing "two crystal balls"
     (is (= (two-crystal-balls data) idx))
-    (is (= (two-crystal-balls (.. (js/Array. 821) (fill false))) -1))))
+    (is (= (two-crystal-balls (.. (js/Array. 821) (fill false))) -1))
+    (is (= (two-crystal-balls-clj data) idx))
+    (is (= (two-crystal-balls-clj (.. (js/Array. 821) (fill false))) -1))))
+
+(let [size 10000
+      idx  (Math/floor (* (Math/random) size))
+      data (.. (js/Array. size) (fill false))]
+  (loop [i idx]
+    (when (< i size)
+      (aset data i true)
+      (recur (inc i))))
+  (time
+   (two-crystal-balls data)
+   #_(two-crystal-balls-clj data) #_"clj is slower here"))
