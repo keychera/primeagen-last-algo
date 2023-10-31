@@ -226,10 +226,9 @@
       (let [curr-v (nth a i) next-v (nth a (inc i))
             do-swap? (> curr-v next-v)]
         (recur (inc i)
-               (if-not do-swap? a
-                       (-> a
-                           (assoc! i next-v)
-                           (assoc! (inc i) curr-v)))
+               (cond-> a
+                 do-swap? (-> (assoc! i next-v)
+                              (assoc! (inc i) curr-v)))
                last-i (or swap-occur? do-swap?)))
       (if swap-occur?
         (recur 0 a (dec last-i) false)
@@ -248,10 +247,9 @@
               (inc j)
               (let [curr-v (nth a j) next-v (nth a (inc j))
                     do-swap? (> curr-v next-v)]
-                (if-not do-swap? a
-                        (-> a
-                            (assoc! j next-v)
-                            (assoc! (inc j) curr-v)))))
+                (cond-> a
+                  do-swap? (-> (assoc! j next-v)
+                               (assoc! (inc j) curr-v)))))
              a)))
         (persistent! a)))))
 
