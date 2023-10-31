@@ -201,3 +201,65 @@
   (time
    (two-crystal-balls data)
    #_(two-crystal-balls-clj data) #_"clj is slower here"))
+
+;; Sorting
+
+;; sorted array is..
+;; any arr[i] <= arr[i+1] 
+
+;; 1. BubbleSort
+
+;; bubble sort needs n , n - 1, n - 2 ... n - n + 1 iterations
+;; what is this running time
+;; let me tell you the tale of an asshole named Gauss
+;; summing all the number from 1..100
+;; ...
+;; (n + 1) * (n / 2)
+;; O(n^2)
+
+;; my take
+(defn bubble-sort [arr]
+  (loop [i 0 a (transient arr)
+         last-i (dec (count a))
+         swap-occur? false]
+    (if (< i last-i)
+      (let [curr-v (nth a i) next-v (nth a (inc i))
+            do-swap? (> curr-v next-v)]
+        (recur (inc i)
+               (if-not do-swap? a
+                       (-> a
+                           (assoc! i next-v)
+                           (assoc! (inc i) curr-v)))
+               last-i (or swap-occur? do-swap?)))
+      (if swap-occur?
+        (recur 0 a (dec last-i) false)
+        (persistent! a)))))
+
+;; second take, following primeagen's typescript
+(defn bubble-sort-primeagen [arr]
+  (let [a (transient arr)]
+    (loop [i 0 a a]
+      (if (< i (count a))
+        (recur
+         (inc i)
+         (loop [j 0 a a]
+           (if (< j (- (count a) 1 i))
+             (recur
+              (inc j)
+              (let [curr-v (nth a j) next-v (nth a (inc j))
+                    do-swap? (> curr-v next-v)]
+                (if-not do-swap? a
+                        (-> a
+                            (assoc! j next-v)
+                            (assoc! (inc j) curr-v)))))
+             a)))
+        (persistent! a)))))
+
+(for [i (range 10)]
+  (inc i))
+
+(let [arr      [9, 3, 7, 4, 69, 420, 42]
+      expected [3, 4, 7, 9, 42, 69, 420]]
+  (testing "bubble sort"
+    (is (= (bubble-sort arr) expected))
+    (is (= (bubble-sort-primeagen arr) expected))))
